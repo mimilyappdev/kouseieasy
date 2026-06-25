@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KouseiEasy - 校正補助ツール</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&family=Nunito:wght@900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Zen Maru Gothic', 'Hiragino Sans', sans-serif;
+    background: #F4F0EA;
+    color: #222;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin-bottom: 0.3rem;
+    color: #8B1A3A;
+  }
+  .subtitle {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 1.5rem;
+  }
+  textarea {
+    width: 100%;
+    height: 220px;
+    padding: 1rem;
+    border: 1.5px solid #E8E0D8;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    resize: vertical;
+    background: #FDFBF9;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { border-color: #8B1A3A; }
+
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 1rem 0;
+  }
+  .option-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: #bbb;
+    cursor: pointer;
+    background: #FDFBF9;
+    border: 1.5px solid #E8E0D8;
+    border-radius: 20px;
+    padding: 0.3rem 0.9rem 0.3rem 0.6rem;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+  }
+  .option-label input { display: none; }
+  .option-label::before {
+    content: '○';
+    font-size: 0.75rem;
+    color: #ccc;
+  }
+  .option-label:has(input:checked) {
+    border-color: #8B1A3A;
+    background: #FDF0F4;
+    color: #8B1A3A;
+  }
+  .option-label:has(input:checked)::before {
+    content: '✓';
+    color: #8B1A3A;
+    font-weight: 700;
+  }
+
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background: #8B1A3A;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-bottom: 1rem;
+    font-family: inherit;
+  }
+  .btn:hover { background: #6e1430; }
+
+  .stats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    background: #FDFBF9;
+    border: 1.5px solid #E8E0D8;
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.82rem;
+    color: #555;
+  }
+  .stat-item span {
+    font-weight: 700;
+    color: #8B1A3A;
+    font-size: 1rem;
+  }
+
+  .result-box {
+    width: 100%;
+    min-height: 220px;
+    padding: 1rem;
+    border: 1.5px solid #E8E0D8;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    background: #FDFBF9;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .result-box mark {
+    background: #fde68a;
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+
+  .copy-btn {
+    margin-top: 0.6rem;
+    padding: 0.5rem 1.2rem;
+    background: #FDFBF9;
+    border: 1.5px solid #8B1A3A;
+    color: #8B1A3A;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: inherit;
+  }
+  .copy-btn:hover { background: #FDF0F4; }
+
+  .section-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #888;
+    margin-bottom: 0.4rem;
+    margin-top: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 600px) {
+    body { padding: 1.2rem 0.75rem; }
+    h1 { font-size: 1.3rem; }
+    textarea { height: 160px; font-size: 0.9rem; }
+    .result-box { min-height: 160px; font-size: 0.9rem; }
+    .option-label { font-size: 0.8rem; padding: 0.25rem 0.75rem 0.25rem 0.5rem; }
+    .btn { font-size: 0.95rem; padding: 0.7rem; }
+    .stat-item { font-size: 0.78rem; padding: 0.35rem 0.6rem; }
+    .stats { gap: 0.5rem; }
+    .copy-btn { width: 100%; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:0.8rem;border-bottom:1.5px solid #E8E0D8;margin-bottom:1rem">
+    <div style="display:flex;flex-direction:column;line-height:1.15">
+      <h1>KouseiEasy</h1>
+      <span style="font-size:11px;color:#9A8880;font-weight:700;letter-spacing:0.08em">校正イージー</span>
+    </div>
+    <a href="https://rakunovel.vercel.app/" target="_blank" style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.15;text-decoration:none;opacity:0.65;transition:opacity 0.2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.65">
+      <span style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:#8B1A3A">RakuNovel</span>
+      <span style="font-size:10px;color:#9A8880;font-weight:700;letter-spacing:0.08em">ラクノーベル ↗</span>
+    </a>
+  </div>
+  <p class="subtitle">自分の必要な校正をワンクリックで。</p>
+
+  <div class="section-label">原稿を貼り付け</div>
+  <textarea id="input" placeholder="ここに原稿を貼り付けてください…"></textarea>
+
+  <div class="options">
+    <label class="option-label"><input type="checkbox" id="opt-indent" checked>自動字下げ</label>
+    <label class="option-label"><input type="checkbox" id="opt-exclaim" checked>！？後の空白</label>
+    <label class="option-label"><input type="checkbox" id="opt-number" checked>数字全角変換</label>
+    <label class="option-label"><input type="checkbox" id="opt-ellipsis" checked>…・―の統一</label>
+    <label class="option-label"><input type="checkbox" id="opt-blank" checked>空白行の統一</label>
+    <label class="option-label"><input type="checkbox" id="opt-hankaku">半角!?→全角！？</label>
+    <label class="option-label"><input type="checkbox" id="opt-kankyo">⁈⁉‼→全角変換</label>
+    <label class="option-label"><input type="checkbox" id="opt-hankana">半角カナ→全角</label>
+    <label class="option-label"><input type="checkbox" id="opt-wave">〜の統一</label>
+  </div>
+
+  <button class="btn" onclick="run()">整形する</button>
+
+  <div id="charcount" style="display:none;margin-bottom:0.6rem;padding:0.6rem 0.9rem;background:#FDFBF9;border:1.5px solid #E8E0D8;border-radius:8px;font-size:0.85rem;color:#555">
+    📝 <span id="cc-total"></span>文字　空白除く <span id="cc-nosp"></span>文字　原稿用紙 <span id="cc-page"></span>枚分
+  </div>
+
+  <div id="stats" class="stats" style="display:none"></div>
+
+  <div class="section-label">整形結果</div>
+  <div class="result-box" id="result">整形結果がここに表示されます。</div>
+  <button class="copy-btn" onclick="copyResult()">テキストをコピー</button>
+  <p style="margin-top:0.6rem;font-size:0.75rem;color:#bbb">※ 整形結果は目安です。最終確認はご自身でお願いします。</p>
+</div>
+
+<footer style="margin-top:3rem;padding:1.5rem 1rem;border-top:1px solid #E8E0D8;text-align:center">
+  <div style="max-width:800px;margin:0 auto">
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:#8B1A3A;margin-bottom:0.4rem">MimilyAppDev</div>
+    <div style="display:flex;justify-content:center;gap:1.2rem;flex-wrap:wrap;margin-bottom:0.8rem">
+      <a href="https://rakunovel.vercel.app/" target="_blank" style="font-size:0.82rem;color:#8B1A3A;text-decoration:none">RakuNovel</a>
+    </div>
+    <p style="font-size:0.75rem;color:#bbb">© 2026 Mimily / アイウィル</p>
+  </div>
+</footer>
+
+<script>
+function run() {
+  const raw = document.getElementById('input').value;
+  if (!raw.trim()) return;
+
+  const optIndent   = document.getElementById('opt-indent').checked;
+  const optExclaim  = document.getElementById('opt-exclaim').checked;
+  const optNumber   = document.getElementById('opt-number').checked;
+  const optEllipsis = document.getElementById('opt-ellipsis').checked;
+  const optBlank    = document.getElementById('opt-blank').checked;
+  const optHankaku  = document.getElementById('opt-hankaku').checked;
+  const optKankyo   = document.getElementById('opt-kankyo').checked;
+  const optHankana  = document.getElementById('opt-hankana').checked;
+  const optWave     = document.getElementById('opt-wave').checked;
+
+  let counts = { indent: 0, exclaim: 0, number: 0, ellipsis: 0, blank: 0, hankaku: 0, kankyo: 0, hankana: 0, wave: 0 };
+  let changes = []; // {start, end} in result string
+
+  // 行ごとに処理
+  let lines = raw.split('\n');
+
+  // 空白行の統一（連続2行以上→1行）
+  if (optBlank) {
+    let newLines = [];
+    let blankCount = 0;
+    for (let line of lines) {
+      if (line.trim() === '') {
+        blankCount++;
+        if (blankCount === 1) newLines.push(line);
+        else counts.blank++;
+      } else {
+        blankCount = 0;
+        newLines.push(line);
+      }
+    }
+    lines = newLines;
+  }
+
+  // 行ごとの変換
+  lines = lines.map(line => {
+    // 空行はスキップ
+    if (line.trim() === '') return line;
+
+    // 字下げ：行頭が全角スペースでない→追加
+    if (optIndent && !/^[　\s「『（【《〔｛｜|(\[]/.test(line)) {
+      line = '　' + line;
+      counts.indent++;
+    }
+
+    // 数字全角変換
+    if (optNumber) {
+      line = line.replace(/[0-9]/g, c => {
+        counts.number++;
+        return String.fromCharCode(c.charCodeAt(0) + 0xFEE0);
+      });
+    }
+
+    // …の統一（...→…、..→…）
+    if (optEllipsis) {
+      line = line.replace(/\.{3}/g, () => { counts.ellipsis++; return '…'; });
+      line = line.replace(/。。。/g, () => { counts.ellipsis++; return '…'; });
+      // ―の統一（--→―）
+      line = line.replace(/--/g, () => { counts.ellipsis++; return '―'; });
+    }
+
+    // 環境依存文字→全角変換（⁈→！？、⁉→！？、‼→！！）
+    if (optKankyo) {
+      line = line.replace(/⁈/g, () => { counts.kankyo++; return '！？'; });
+      line = line.replace(/⁉/g, () => { counts.kankyo++; return '！？'; });
+      line = line.replace(/‼/g, () => { counts.kankyo++; return '！！'; });
+    }
+
+    // 半角!?→全角！？
+    if (optHankaku) {
+      line = line.replace(/!/g, () => { counts.hankaku++; return '！'; });
+      line = line.replace(/\?/g, () => { counts.hankaku++; return '？'; });
+    }
+
+    // 半角カナ→全角カナ
+    if (optHankana) {
+      const hankanaMap = {
+        'ｦ':'ヲ','ｧ':'ァ','ｨ':'ィ','ｩ':'ゥ','ｪ':'ェ','ｫ':'ォ','ｬ':'ャ','ｭ':'ュ','ｮ':'ョ','ｯ':'ッ','ｰ':'ー',
+        'ｱ':'ア','ｲ':'イ','ｳ':'ウ','ｴ':'エ','ｵ':'オ','ｶ':'カ','ｷ':'キ','ｸ':'ク','ｹ':'ケ','ｺ':'コ',
+        'ｻ':'サ','ｼ':'シ','ｽ':'ス','ｾ':'セ','ｿ':'ソ','ﾀ':'タ','ﾁ':'チ','ﾂ':'ツ','ﾃ':'テ','ﾄ':'ト',
+        'ﾅ':'ナ','ﾆ':'ニ','ﾇ':'ヌ','ﾈ':'ネ','ﾉ':'ノ','ﾊ':'ハ','ﾋ':'ヒ','ﾌ':'フ','ﾍ':'ヘ','ﾎ':'ホ',
+        'ﾏ':'マ','ﾐ':'ミ','ﾑ':'ム','ﾒ':'メ','ﾓ':'モ','ﾔ':'ヤ','ﾕ':'ユ','ﾖ':'ヨ',
+        'ﾗ':'ラ','ﾘ':'リ','ﾙ':'ル','ﾚ':'レ','ﾛ':'ロ','ﾜ':'ワ','ﾝ':'ン','ﾞ':'゛','ﾟ':'゜'
+      };
+      const dakuten = {'カ':'ガ','キ':'ギ','ク':'グ','ケ':'ゲ','コ':'ゴ','サ':'ザ','シ':'ジ','ス':'ズ','セ':'ゼ','ソ':'ゾ','タ':'ダ','チ':'ヂ','ツ':'ヅ','テ':'デ','ト':'ド','ハ':'バ','ヒ':'ビ','フ':'ブ','ヘ':'ベ','ホ':'ボ','ウ':'ヴ'};
+      const handaku  = {'ハ':'パ','ヒ':'ピ','フ':'プ','ヘ':'ペ','ホ':'ポ'};
+      let converted = '';
+      for (let k = 0; k < line.length; k++) {
+        const c = line[k], next = line[k+1];
+        if (hankanaMap[c]) {
+          const full = hankanaMap[c];
+          if (next === 'ﾞ' && dakuten[full]) { converted += dakuten[full]; k++; counts.hankana++; }
+          else if (next === 'ﾟ' && handaku[full]) { converted += handaku[full]; k++; counts.hankana++; }
+          else { converted += full; counts.hankana++; }
+        } else { converted += c; }
+      }
+      line = converted;
+    }
+
+    // 〜の統一（半角~・全角～→〜）
+    if (optWave) {
+      line = line.replace(/[~～]/g, () => { counts.wave++; return '〜'; });
+    }
+
+    // ！？の後に空白（連続の場合は最後だけ）
+    if (optExclaim) {
+      line = line.replace(/([！？]+)(?=[^\s！？\n」』）】》〕｝、。…―])/g, (match, p1) => {
+        counts.exclaim++;
+        return p1 + '　';
+      });
+    }
+
+    return line;
+  });
+
+  const result = lines.join('\n');
+
+  // ハイライト用：元テキストと差分を簡易的にマーク
+  // 変更箇所を検出して<mark>で囲む
+  const highlighted = buildHighlight(raw, result);
+
+  document.getElementById('result').innerHTML = highlighted;
+
+  // 文字数カウント（結果テキストで計算）
+  const totalChars = result.length;
+  const noSpChars  = result.replace(/[\s　]/g, '').length;
+  const pages      = Math.ceil(noSpChars / 400);
+  const ccEl = document.getElementById('charcount');
+  ccEl.style.display = 'block';
+  document.getElementById('cc-total').textContent = totalChars.toLocaleString();
+  document.getElementById('cc-nosp').textContent  = noSpChars.toLocaleString();
+  document.getElementById('cc-page').textContent  = pages;
+
+  // 統計表示（チェック済みかつ件数ありのみ）
+  const statDefs = [
+    { key: 'indent',  opt: optIndent,   label: '字下げ追加',    unit: '箇所' },
+    { key: 'exclaim', opt: optExclaim,  label: '！？空白',      unit: '箇所' },
+    { key: 'number',  opt: optNumber,   label: '数字全角',      unit: '箇所' },
+    { key: 'ellipsis',opt: optEllipsis, label: '記号統一',      unit: '箇所' },
+    { key: 'blank',   opt: optBlank,    label: '空白行削除',    unit: '行'   },
+    { key: 'hankaku', opt: optHankaku,  label: '半角!?全角化',  unit: '箇所' },
+    { key: 'kankyo',  opt: optKankyo,   label: '環境依存変換',  unit: '箇所' },
+    { key: 'hankana', opt: optHankana,  label: '半角カナ全角化',unit: '箇所' },
+    { key: 'wave',    opt: optWave,     label: '〜統一',        unit: '箇所' },
+  ];
+  const statsEl = document.getElementById('stats');
+  const items = statDefs.filter(d => d.opt && counts[d.key] > 0)
+    .map(d => `<div class="stat-item">${d.label} <span>${counts[d.key]}</span> ${d.unit}</div>`)
+    .join('');
+  if (items) {
+    statsEl.style.display = 'flex';
+    statsEl.innerHTML = items;
+  } else {
+    statsEl.style.display = 'none';
+    statsEl.innerHTML = '';
+  }
+
+  // コピー用に生テキスト保存
+  window._plainResult = result;
+}
+
+function buildHighlight(original, result) {
+  // 行ごとに比較してハイライト
+  const origLines = original.split('\n');
+  const resLines  = result.split('\n');
+  let html = '';
+
+  for (let i = 0; i < resLines.length; i++) {
+    const orig = origLines[i] || '';
+    const res  = resLines[i];
+    if (orig === res) {
+      html += escHtml(res);
+    } else {
+      // 文字単位で差分検出
+      html += diffLine(orig, res);
+    }
+    if (i < resLines.length - 1) html += '\n';
+  }
+  return html;
+}
+
+function diffLine(orig, res) {
+  // 簡易：変更された文字をmarkで囲む
+  let html = '';
+  let i = 0, j = 0;
+  while (i < orig.length || j < res.length) {
+    if (orig[i] === res[j]) {
+      html += escHtml(res[j]);
+      i++; j++;
+    } else {
+      // 追加・変更文字をハイライト
+      let chunk = '';
+      // 挿入された文字を収集
+      while (j < res.length && orig[i] !== res[j]) {
+        chunk += res[j];
+        j++;
+      }
+      if (chunk) html += '<mark>' + escHtml(chunk) + '</mark>';
+      // 元の文字をスキップ（削除）
+      if (i < orig.length && orig[i] !== res[j]) i++;
+    }
+  }
+  return html;
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function copyResult() {
+  if (!window._plainResult) return;
+  navigator.clipboard.writeText(window._plainResult).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'コピーしました！';
+    setTimeout(() => btn.textContent = 'テキストをコピー', 2000);
+  });
+}
+</script>
+</body>
+</html>
