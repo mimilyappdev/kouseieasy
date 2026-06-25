@@ -13,18 +13,31 @@
     background: #F4F0EA;
     color: #222;
     min-height: 100vh;
-    padding: 2rem 1rem;
   }
+
+  /* ── ヘッダー ── */
+  .ke-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px; height: 52px;
+    background: #C0504D; color: white; flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(192,80,77,0.3);
+  }
+  .ke-logo { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 22px; }
+  .ke-logo-kana { font-size: 10px; color: rgba(255,255,255,0.6); font-weight: 700; letter-spacing: 0.08em; }
+  .ke-btn-top {
+    background: transparent; color: rgba(255,255,255,0.9);
+    border: 1.5px solid rgba(255,255,255,0.5); border-radius: 6px;
+    padding: 4px 12px; font-size: 11px; font-weight: 700;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    text-decoration: none; white-space: nowrap; transition: .15s;
+  }
+  .ke-btn-top:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.85); }
+
+  /* ── メイン ── */
   .container {
     max-width: 800px;
     margin: 0 auto;
-  }
-  h1 {
-    font-family: 'Nunito', sans-serif;
-    font-size: 1.6rem;
-    font-weight: 900;
-    margin-bottom: 0.3rem;
-    color: #8B1A3A;
+    padding: 2rem 1rem;
   }
   .subtitle {
     font-size: 0.85rem;
@@ -45,7 +58,7 @@
     outline: none;
     transition: border-color 0.2s;
   }
-  textarea:focus { border-color: #8B1A3A; }
+  textarea:focus { border-color: #C0504D; }
 
   .options {
     display: flex;
@@ -67,105 +80,57 @@
     transition: border-color 0.2s, background 0.2s, color 0.2s;
   }
   .option-label input { display: none; }
-  .option-label::before {
-    content: '○';
-    font-size: 0.75rem;
-    color: #ccc;
-  }
+  .option-label::before { content: '○'; font-size: 0.75rem; color: #ccc; }
   .option-label:has(input:checked) {
-    border-color: #8B1A3A;
-    background: #FDF0F4;
-    color: #8B1A3A;
+    border-color: #C0504D;
+    background: #FEF0EF;
+    color: #C0504D;
   }
-  .option-label:has(input:checked)::before {
-    content: '✓';
-    color: #8B1A3A;
-    font-weight: 700;
-  }
+  .option-label:has(input:checked)::before { content: '✓'; color: #C0504D; font-weight: 700; }
 
   .btn {
-    display: block;
-    width: 100%;
-    padding: 0.75rem;
-    background: #8B1A3A;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s;
-    margin-bottom: 1rem;
-    font-family: inherit;
+    display: block; width: 100%; padding: 0.75rem;
+    background: #C0504D; color: #fff; border: none;
+    border-radius: 8px; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: background 0.2s;
+    margin-bottom: 1rem; font-family: inherit;
   }
-  .btn:hover { background: #6e1430; }
+  .btn:hover { background: #a03a38; }
 
-  .stats {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 0.8rem;
-    flex-wrap: wrap;
-  }
+  .stats { display: flex; gap: 1rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
   .stat-item {
-    background: #FDFBF9;
-    border: 1.5px solid #E8E0D8;
-    border-radius: 8px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.82rem;
-    color: #555;
+    background: #FDFBF9; border: 1.5px solid #E8E0D8;
+    border-radius: 8px; padding: 0.4rem 0.8rem;
+    font-size: 0.82rem; color: #555;
   }
-  .stat-item span {
-    font-weight: 700;
-    color: #8B1A3A;
-    font-size: 1rem;
-  }
+  .stat-item span { font-weight: 700; color: #C0504D; font-size: 1rem; }
 
   .result-box {
-    width: 100%;
-    min-height: 220px;
-    padding: 1rem;
-    border: 1.5px solid #E8E0D8;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    line-height: 1.8;
-    background: #FDFBF9;
-    white-space: pre-wrap;
-    word-break: break-all;
+    width: 100%; min-height: 220px; padding: 1rem;
+    border: 1.5px solid #E8E0D8; border-radius: 8px;
+    font-size: 0.95rem; line-height: 1.8;
+    background: #FDFBF9; white-space: pre-wrap; word-break: break-all;
   }
-  .result-box mark {
-    background: #fde68a;
-    border-radius: 2px;
-    padding: 0 1px;
-  }
+  .result-box mark { background: #fde68a; border-radius: 2px; padding: 0 1px; }
 
   .copy-btn {
-    margin-top: 0.6rem;
-    padding: 0.5rem 1.2rem;
-    background: #FDFBF9;
-    border: 1.5px solid #8B1A3A;
-    color: #8B1A3A;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-    font-family: inherit;
+    margin-top: 0.6rem; padding: 0.5rem 1.2rem;
+    background: #FDFBF9; border: 1.5px solid #C0504D;
+    color: #C0504D; border-radius: 6px; font-size: 0.85rem;
+    font-weight: 600; cursor: pointer; transition: background 0.2s; font-family: inherit;
   }
-  .copy-btn:hover { background: #FDF0F4; }
+  .copy-btn:hover { background: #FEF0EF; }
 
   .section-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #888;
-    margin-bottom: 0.4rem;
-    margin-top: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-size: 0.8rem; font-weight: 600; color: #888;
+    margin-bottom: 0.4rem; margin-top: 1rem;
+    text-transform: uppercase; letter-spacing: 0.05em;
   }
 
   @media (max-width: 600px) {
-    body { padding: 1.2rem 0.75rem; }
-    h1 { font-size: 1.3rem; }
+    .ke-header { padding: 0 12px; }
+    .ke-logo { font-size: 18px; }
+    .container { padding: 1.2rem 0.75rem; }
     textarea { height: 160px; font-size: 0.9rem; }
     .result-box { min-height: 160px; font-size: 0.9rem; }
     .option-label { font-size: 0.8rem; padding: 0.25rem 0.75rem 0.25rem 0.5rem; }
@@ -177,17 +142,15 @@
 </style>
 </head>
 <body>
-<div class="container">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:0.8rem;border-bottom:1.5px solid #E8E0D8;margin-bottom:1rem">
-    <div style="display:flex;flex-direction:column;line-height:1.15">
-      <h1>KouseiEasy</h1>
-      <span style="font-size:11px;color:#9A8880;font-weight:700;letter-spacing:0.08em">校正イージー</span>
-    </div>
-    <a href="https://rakunovel.vercel.app/" target="_blank" style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.15;text-decoration:none;opacity:0.65;transition:opacity 0.2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.65">
-      <span style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:#8B1A3A">RakuNovel</span>
-      <span style="font-size:10px;color:#9A8880;font-weight:700;letter-spacing:0.08em">ラクノーベル ↗</span>
-    </a>
+<header class="ke-header">
+  <div style="display:flex;flex-direction:column;line-height:1.2">
+    <span class="ke-logo">KouseiEasy</span>
+    <span class="ke-logo-kana">校正イージー</span>
   </div>
+  <a href="https://rakunovel.vercel.app/" target="_blank" class="ke-btn-top">RakuNovel ↗</a>
+</header>
+
+<div class="container">
   <p class="subtitle">自分の必要な校正をワンクリックで。</p>
 
   <div class="section-label">原稿を貼り付け</div>
@@ -221,9 +184,9 @@
 
 <footer style="margin-top:3rem;padding:1.5rem 1rem;border-top:1px solid #E8E0D8;text-align:center">
   <div style="max-width:800px;margin:0 auto">
-    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:#8B1A3A;margin-bottom:0.4rem">MimilyAppDev</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:#C0504D;margin-bottom:0.4rem">MimilyAppDev</div>
     <div style="display:flex;justify-content:center;gap:1.2rem;flex-wrap:wrap;margin-bottom:0.8rem">
-      <a href="https://rakunovel.vercel.app/" target="_blank" style="font-size:0.82rem;color:#8B1A3A;text-decoration:none">RakuNovel</a>
+      <a href="https://rakunovel.vercel.app/" target="_blank" style="font-size:0.82rem;color:#C0504D;text-decoration:none">RakuNovel</a>
     </div>
     <p style="font-size:0.75rem;color:#bbb">© 2026 Mimily / アイウィル</p>
   </div>
