@@ -168,6 +168,14 @@
     <label class="option-label"><input type="checkbox" id="opt-wave">〜の統一</label>
   </div>
 
+  <div class="section-label">なろう・カクヨム記法変換</div>
+  <div class="options">
+    <label class="option-label"><input type="checkbox" id="opt-ruby" checked>ルビ削除（｜《》）</label>
+    <label class="option-label"><input type="checkbox" id="opt-ruby-paren" checked>なろう式ルビ削除（(ふりがな)）</label>
+    <label class="option-label"><input type="checkbox" id="opt-boten" checked>傍点削除（《《》》）</label>
+  </div>
+  <p style="font-size:0.72rem;color:#bbb;margin:-0.4rem 0 1rem">※ RakuNovelが将来ルビ・傍点に対応した際は、この変換は不要になります。</p>
+
   <button class="btn" onclick="run()">整形する</button>
 
   <div id="charcount" style="display:none;margin-bottom:0.6rem;padding:0.6rem 0.9rem;background:#FDFBF9;border:1.5px solid #E8E0D8;border-radius:8px;font-size:0.85rem;color:#555">
@@ -206,8 +214,11 @@ function run() {
   const optKankyo   = document.getElementById('opt-kankyo').checked;
   const optHankana  = document.getElementById('opt-hankana').checked;
   const optWave     = document.getElementById('opt-wave').checked;
+  const optRuby      = document.getElementById('opt-ruby').checked;
+  const optRubyParen = document.getElementById('opt-ruby-paren').checked;
+  const optBoten      = document.getElementById('opt-boten').checked;
 
-  let counts = { indent: 0, exclaim: 0, number: 0, ellipsis: 0, blank: 0, hankaku: 0, kankyo: 0, hankana: 0, wave: 0 };
+  let counts = { indent: 0, exclaim: 0, number: 0, ellipsis: 0, blank: 0, hankaku: 0, kankyo: 0, hankana: 0, wave: 0, ruby: 0, rubyParen: 0, boten: 0 };
   let changes = []; // {start, end} in result string
 
   // 行ごとに処理
@@ -234,6 +245,27 @@ function run() {
   lines = lines.map(line => {
     // 空行はスキップ
     if (line.trim() === '') return line;
+
+    // なろう・カクヨム記法変換（字下げ判定より前に処理する）
+    const kanji = '\\u4E00-\\u9FFF\\u3005\\u3007';
+    if (optBoten) {
+      line = line.replace(/《《([^《》\n]+?)》》/g, (m, p1) => { counts.boten++; return p1; });
+    }
+    if (optRuby) {
+      // エスケープされた《（｜直後に《があり本文が空でルビが成立せず、《がそのまま表示される）を退避
+      const ESC = '\uE000';
+      line = line.replace(/[｜|]《/g, ESC);
+      line = line.replace(/[｜|]([^｜|《》\n]+?)《([^《》\n]+?)》/g, (m, p1) => { counts.ruby++; return p1; });
+      line = line.replace(new RegExp(`([${kanji}]+)《([^《》\\n]+?)》`, 'g'), (m, p1) => { counts.ruby++; return p1; });
+      // 退避した《を文字として復元
+      line = line.replace(new RegExp(ESC, 'g'), '《');
+    }
+    if (optRubyParen) {
+      // 通常の()ルビを変換（漢字と｜で区切られたものは隣接しないためここではマッチしない）
+      line = line.replace(new RegExp(`([${kanji}]+)[(（]([ぁ-んァ-ヶーゝゞ]+)[)）]`, 'g'), (m, p1) => { counts.rubyParen++; return p1; });
+      // エスケープ用の｜（漢字と括弧の間）を除去し、括弧書きをそのまま残す
+      line = line.replace(new RegExp(`(?<=[${kanji}])[｜|](?=[(（])`, 'g'), '');
+    }
 
     // 字下げ：行頭が全角スペースでない→追加
     if (optIndent && !/^[　\s「『（【《〔｛｜|(\[]/.test(line)) {
@@ -340,6 +372,9 @@ function run() {
     { key: 'kankyo',  opt: optKankyo,   label: '環境依存変換',  unit: '箇所' },
     { key: 'hankana', opt: optHankana,  label: '半角カナ全角化',unit: '箇所' },
     { key: 'wave',    opt: optWave,     label: '〜統一',        unit: '箇所' },
+    { key: 'ruby',      opt: optRuby,      label: 'ルビ削除',        unit: '箇所' },
+    { key: 'rubyParen', opt: optRubyParen, label: 'なろう式ルビ削除', unit: '箇所' },
+    { key: 'boten',     opt: optBoten,     label: '傍点削除',        unit: '箇所' },
   ];
   const statsEl = document.getElementById('stats');
   const items = statDefs.filter(d => d.opt && counts[d.key] > 0)
