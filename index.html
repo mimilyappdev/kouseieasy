@@ -46,6 +46,18 @@
     margin: 0 auto;
     padding: 2rem 1rem;
   }
+  .split-layout { display: flex; flex-direction: column; }
+  .left-col, .right-col { min-width: 0; }
+
+  @media (min-width: 900px) {
+    .container { max-width: 1500px; padding: 18px 24px; }
+    .split-layout { flex-direction: row; align-items: flex-start; gap: 24px; }
+    .left-col, .right-col { flex: 1 1 0; }
+    textarea { height: 360px; font-size: 15.2px; }
+    .result-box { min-height: 380px; font-size: 15.2px; }
+    .option-label { font-size: 12.6px; padding: 4.8px 0.9rem 4.8px 0.6rem; }
+    .section-label { font-size: 15px; }
+  }
   .subtitle {
     font-size: 0.85rem;
     color: #888;
@@ -160,42 +172,48 @@
 <div class="container">
   <p class="subtitle">自分の必要な校正をワンクリックで。</p>
 
-  <div class="section-label">原稿を貼り付け</div>
-  <textarea id="input" placeholder="ここに原稿を貼り付けてください…"></textarea>
+  <div class="split-layout">
+    <div class="left-col">
+      <div class="section-label">原稿を貼り付け</div>
+      <textarea id="input" placeholder="ここに原稿を貼り付けてください…"></textarea>
 
-  <div class="options">
-    <label class="option-label"><input type="checkbox" id="opt-indent" checked>自動字下げ</label>
-    <label class="option-label"><input type="checkbox" id="opt-exclaim" checked>！？後の空白</label>
-    <label class="option-label"><input type="checkbox" id="opt-number" checked>数字全角変換</label>
-    <label class="option-label"><input type="checkbox" id="opt-ellipsis" checked>…・―の統一</label>
-    <label class="option-label"><input type="checkbox" id="opt-blank" checked>空白行の統一</label>
-    <label class="option-label"><input type="checkbox" id="opt-hankaku">半角!?→全角！？</label>
-    <label class="option-label"><input type="checkbox" id="opt-kankyo">⁈⁉‼→全角変換</label>
-    <label class="option-label"><input type="checkbox" id="opt-hankana">半角カナ→全角</label>
-    <label class="option-label"><input type="checkbox" id="opt-wave">〜の統一</label>
+      <div class="options">
+        <label class="option-label"><input type="checkbox" id="opt-indent" checked>自動字下げ</label>
+        <label class="option-label"><input type="checkbox" id="opt-exclaim" checked>！？後の空白</label>
+        <label class="option-label"><input type="checkbox" id="opt-number" checked>数字全角変換</label>
+        <label class="option-label"><input type="checkbox" id="opt-ellipsis" checked>…・―の統一</label>
+        <label class="option-label"><input type="checkbox" id="opt-blank" checked>空白行の統一</label>
+        <label class="option-label"><input type="checkbox" id="opt-hankaku">半角!?→全角！？</label>
+        <label class="option-label"><input type="checkbox" id="opt-kankyo">⁈⁉‼→全角変換</label>
+        <label class="option-label"><input type="checkbox" id="opt-hankana">半角カナ→全角</label>
+        <label class="option-label"><input type="checkbox" id="opt-wave">〜の統一</label>
+      </div>
+
+      <div class="section-label">なろう・カクヨム記法変換</div>
+      <div class="options">
+        <label class="option-label"><input type="checkbox" id="opt-ruby" checked>ルビ削除（｜《》）</label>
+        <label class="option-label"><input type="checkbox" id="opt-ruby-paren" checked>なろう式ルビ削除（(ふりがな)）</label>
+        <label class="option-label"><input type="checkbox" id="opt-boten" checked>傍点削除（《《》》）</label>
+      </div>
+      <p style="font-size:0.72rem;color:#bbb;margin:-0.4rem 0 1rem">※ RakuNovelが将来ルビ・傍点に対応した際は、この変換は不要になります。</p>
+
+      <button class="btn" onclick="run()">整形する</button>
+
+      <div id="charcount" style="display:none;margin-bottom:0.6rem;padding:0.6rem 0.9rem;background:#FDFBF9;border:1.5px solid #E8E0D8;border-radius:8px;font-size:0.85rem;color:#555">
+        📝 <span id="cc-total"></span>文字　空白除く <span id="cc-nosp"></span>文字　原稿用紙 <span id="cc-page"></span>枚分
+      </div>
+
+      <div id="stats" class="stats" style="display:none"></div>
+    </div>
+
+    <div class="right-col">
+      <div class="section-label">整形結果</div>
+      <div class="result-box" id="result">整形結果がここに表示されます。</div>
+      <button class="copy-btn" onclick="copyResult()">テキストをコピー</button>
+      <a href="https://rakunovel.vercel.app/" target="_blank" class="ke-result-cta">📚 本にするならRakuNovel →</a>
+      <p style="margin-top:0.6rem;font-size:0.75rem;color:#bbb">※ 整形結果は目安です。最終確認はご自身でお願いします。</p>
+    </div>
   </div>
-
-  <div class="section-label">なろう・カクヨム記法変換</div>
-  <div class="options">
-    <label class="option-label"><input type="checkbox" id="opt-ruby" checked>ルビ削除（｜《》）</label>
-    <label class="option-label"><input type="checkbox" id="opt-ruby-paren" checked>なろう式ルビ削除（(ふりがな)）</label>
-    <label class="option-label"><input type="checkbox" id="opt-boten" checked>傍点削除（《《》》）</label>
-  </div>
-  <p style="font-size:0.72rem;color:#bbb;margin:-0.4rem 0 1rem">※ RakuNovelが将来ルビ・傍点に対応した際は、この変換は不要になります。</p>
-
-  <button class="btn" onclick="run()">整形する</button>
-
-  <div id="charcount" style="display:none;margin-bottom:0.6rem;padding:0.6rem 0.9rem;background:#FDFBF9;border:1.5px solid #E8E0D8;border-radius:8px;font-size:0.85rem;color:#555">
-    📝 <span id="cc-total"></span>文字　空白除く <span id="cc-nosp"></span>文字　原稿用紙 <span id="cc-page"></span>枚分
-  </div>
-
-  <div id="stats" class="stats" style="display:none"></div>
-
-  <div class="section-label">整形結果</div>
-  <div class="result-box" id="result">整形結果がここに表示されます。</div>
-  <button class="copy-btn" onclick="copyResult()">テキストをコピー</button>
-  <a href="https://rakunovel.vercel.app/" target="_blank" class="ke-result-cta">📚 本にするならRakuNovel →</a>
-  <p style="margin-top:0.6rem;font-size:0.75rem;color:#bbb">※ 整形結果は目安です。最終確認はご自身でお願いします。</p>
 </div>
 
 <footer style="margin-top:3rem;padding:1.5rem 1rem;border-top:1px solid #E8E0D8;text-align:center">
